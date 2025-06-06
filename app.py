@@ -112,7 +112,7 @@ with metrics_col:
     """, unsafe_allow_html=True)
 
 with chart_col:
-    st.subheader("📉 Monthly Energy Saving Trend (2025)")
+    st.subheader("📉 Monthly Energy Saving Trend 2025")
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(
