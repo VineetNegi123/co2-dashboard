@@ -167,6 +167,7 @@ st.markdown("""
     <button onclick="window.print()" style="padding:10px 20px; font-size:16px; background:#1f77b4; color:white; border:none; border-radius:6px; cursor:pointer;">
         🖨️ Print / Save Full Page as PDF
     </button>
+    <p style='font-size:13px; margin-top:10px;'>Use this button to export the entire dashboard view including charts and inputs.</p>
 """, unsafe_allow_html=True)
 
 st.markdown("""
