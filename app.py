@@ -66,4 +66,4 @@ if uploaded_file:
         st.dataframe(df.head())
     except Exception as e:
         st.error(f"Failed to read file: {e}")
-Add Streamlit app
+
