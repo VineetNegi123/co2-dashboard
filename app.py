@@ -95,6 +95,14 @@ for i in range(years):
     net_cash_flow.append(net if i == 0 else net_cash_flow[-1] + net)
     cumulative_savings.append(net_cash_flow[-1])
 
+# Dynamic net income and payback based on real formula
+three_year_net_income = round(cumulative_savings[2] / 1000)
+payback_months = 0
+for i in range(years):
+    if cumulative_savings[i] >= 0:
+        payback_months = round((i + 1) * 12 * ((total_costs[i] - annual_savings) / annual_savings), 0)
+        break
+
 # Overview Metrics
 st.markdown("### 📈 Overview")
 metrics_col, chart_col = st.columns([1, 3])
@@ -107,9 +115,9 @@ with metrics_col:
     <br>
     <div class=\"metric-box\">{savings_percentage * 100:.1f}%<div class=\"metric-label\">Saving Percentage</div></div>
     <br>
-    <div class=\"metric-box\">09<div class=\"metric-label\">Months<br>Payback Period</div></div>
+    <div class=\"metric-box\">{int(payback_months):02d}<div class=\"metric-label\">Months<br>Payback Period</div></div>
     <br>
-    <div class=\"metric-box\">135k<div class=\"metric-label\">US Dollars<br>Net Income (3yrs)</div></div>
+    <div class=\"metric-box\">{three_year_net_income}k<div class=\"metric-label\">US Dollars<br>Net Income (3yrs)</div></div>
     """, unsafe_allow_html=True)
 
 with chart_col:
