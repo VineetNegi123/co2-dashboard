@@ -1,11 +1,5 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from PIL import Image
-import io
-import numpy as np
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 # Set page config
 st.set_page_config(page_title="CO₂ Reduction Calculator", layout="wide")
@@ -102,80 +96,29 @@ with col2:
     st.metric("Equivalent Flats", f"{flats_equivalent:,.2f}")
     st.metric("Equivalent Cars Removed", f"{cars_removed:,.2f}")
 
-# Generate Graph
-st.header("CO₂ Reduction Equivalents")
+# Saving Percentage Graph Style (Clean version like screenshot)
+saving_years = [2024, 2025, 2026]
+saving_values = [8.8, 9.0, 9.2]  # Example data only
+energy_trend = [176000, 178000, 180000]  # Corresponding energy reduction data
 
-# Set consistent light theme colors
-plt.style.use('default')
-bg_color = '#FFFFFF'
-text_color = '#1F2937'
-grid_color = '#E5E7EB'
-bar_colors = ['#059669', '#2563EB', '#7C3AED']
+st.subheader("📉 Saving Percentage Timeline")
+colA, colB = st.columns(2)
 
-# Create the bar chart with modern style
-fig, ax = plt.subplots(figsize=(12, 6))
-fig.patch.set_facecolor(bg_color)
-ax.set_facecolor(bg_color)
+with colA:
+    st.metric("Carbon Reduction", f"{annual_co2_reduction / 1000:.1f} tCO₂e/yr")
+    st.metric("Energy Reduction", f"{energy_savings / 1000:.0f}k kWh/yr")
 
-categories = ['Trees\nPlanted', 'Equivalent\nFlats', 'Cars\nRemoved']
-values = [trees_planted, flats_equivalent, cars_removed]
-
-# Plot with modern styling
-bars = ax.bar(categories, values, color=bar_colors, width=0.6)
-
-# Customize the graph
-ax.set_ylabel('Count', fontsize=12, fontweight='bold', color=text_color)
-ax.set_title('CO₂ Reduction Equivalents', fontsize=14, fontweight='bold', pad=20, color=text_color)
-
-# Add value labels on top of bars with thousands separator
-for bar in bars:
-    height = bar.get_height()
-    ax.text(bar.get_x() + bar.get_width()/2., height,
-            f'{height:,.0f}',
-            ha='center', va='bottom',
-            fontsize=10,
-            fontweight='bold',
-            color=text_color)
-
-# Customize grid
-ax.grid(axis='y', linestyle='--', alpha=0.2, color=grid_color)
-ax.set_axisbelow(True)
-
-# Remove spines
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
-ax.spines['left'].set_color(grid_color)
-ax.spines['bottom'].set_color(grid_color)
-
-# Customize tick labels
-plt.xticks(fontsize=10, fontweight='bold', color=text_color)
-plt.yticks(fontsize=10, color=text_color)
-
-# Adjust layout
-plt.tight_layout()
-
-# Display the plot
-st.pyplot(fig)
-
-# Download button for the graph
-buf = io.BytesIO()
-plt.savefig(buf, format='png', dpi=300, bbox_inches='tight', facecolor=bg_color)
-buf.seek(0)
-
-st.download_button(
-    label="Download Graph",
-    data=buf,
-    file_name="co2_reduction_equivalents.png",
-    mime="image/png"
-)
-
-# Clear the matplotlib figure
-plt.close()
+with colB:
+    df = pd.DataFrame({
+        "Saving %": saving_values,
+        "Energy Reduction": energy_trend
+    }, index=saving_years)
+    st.line_chart(df)
 
 # Footer with information about the factors
 st.markdown("---")
 st.markdown("""
-*Notes:*
+**Notes:**
 - Trees planted equivalent assumes each tree absorbs 22 kg CO₂ per year
 - Flats equivalent assumes 320 kg CO₂ per flat per year
 - Cars removed equivalent assumes 200 kg CO₂ per car per year
