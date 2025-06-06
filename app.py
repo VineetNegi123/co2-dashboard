@@ -116,7 +116,7 @@ with chart_col:
     fig.update_layout(
         height=420,
         xaxis=dict(title='', showgrid=False, tickfont=dict(size=14), tickmode='array', tickvals=years),
-        yaxis=dict(title='', showgrid=True, zeroline=False, gridcolor='lightgrey', tickfont=dict(size=14), range=[0, 220000]),
+        yaxis=dict(title='', showgrid=True, zeroline=False, gridcolor='lightgrey', tickfont=dict(size=14), range=[energy_savings - 50000, energy_savings + 50000]),
         margin=dict(l=10, r=10, t=30, b=30),
         showlegend=False,
         plot_bgcolor='white'
@@ -133,3 +133,4 @@ st.markdown("""
 - You can update inputs and graph responds accordingly
 """)
 st.caption("Crafted for client-ready insights • Powered by Streamlit")
+
