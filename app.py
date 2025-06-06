@@ -89,19 +89,31 @@ with metrics_col:
 
 with chart_col:
     st.markdown("#### 📉 Annual Saving")
-    years = list(range(2024, 2027))
+    years = [2024, 2025, 2026]
     savings = [savings_percentage * 100 - i * 0.2 for i in range(len(years))]  # slight variation
     energy_trend = [energy_savings - (i * 2000) for i in range(len(years))]  # mock downward trend
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=years, y=energy_trend, name='Energy Reduction (kWh)',
-                             line=dict(color='rgba(0, 98, 255, 1)', width=3)))
+    fig.add_trace(go.Scatter(
+        x=years,
+        y=energy_trend,
+        name='Energy Reduction (kWh)',
+        line=dict(color='rgba(0, 98, 255, 1)', width=3),
+        mode='lines+markers+text',
+        text=[f"{int(val/1000)}k" for val in energy_trend],
+        textposition="top center"
+    )))
     fig.add_trace(go.Scatter(x=years, y=[200000]*3, fill='tonexty', mode='none',
                              fillcolor='rgba(222, 0, 255, 0.08)', name=''))
 
     fig.update_layout(
-        height=380,
-        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14)),
+        height=420,
+        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14), tickmode='array', tickvals=years),
+        yaxis=dict(title='', showgrid=True, zeroline=False, gridcolor='lightgrey', tickfont=dict(size=14)),
+        margin=dict(l=10, r=10, t=30, b=30),
+        showlegend=False,
+        plot_bgcolor='white'
+    )),
         yaxis=dict(title='', showgrid=False, tickfont=dict(size=14), range=[0, 220000]),
         margin=dict(l=10, r=10, t=30, b=30),
         showlegend=False,
