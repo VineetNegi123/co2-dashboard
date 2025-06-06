@@ -161,11 +161,19 @@ st.download_button(
     mime="text/plain"
 )
 
+# Print to PDF button (browser triggered)
+st.markdown("""
+    <br>
+    <button onclick="window.print()" style="padding:10px 20px; font-size:16px; background:#1f77b4; color:white; border:none; border-radius:6px; cursor:pointer;">
+        🖨️ Print / Save Full Page as PDF
+    </button>
+""", unsafe_allow_html=True)
+
 st.markdown("""
 **Notes:**
 - Chart shows only total for 2025 without monthly breakdown.
 - ROI forecast reflects adjustable investment + fee vs. energy cost savings.
-- Click the download button above to get a printable summary file.
+- Use the blue print button to download full proposal as PDF from browser.
 """)
 
 st.caption("Crafted by Univers AI • Powered by Streamlit • Engineered for client impact.")
