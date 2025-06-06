@@ -57,7 +57,7 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     energy_savings = st.number_input("Energy Savings (kWh/year)", value=1040249.0)
-    
+
 with col2:
     selected_country = st.selectbox("Select Country", list(country_factors.keys()))
     if selected_country == "Custom":
@@ -65,7 +65,7 @@ with col2:
     else:
         carbon_emission_factor = country_factors[selected_country]
         st.info(f"Carbon Emission Factor for {selected_country}: {carbon_emission_factor} kg CO₂/kWh")
-    
+
 with col3:
     electricity_rate = st.number_input("Electricity Rate ($/kWh)", value=0.14)
     savings_percentage = st.number_input("Savings Percentage", value=0.05, format="%.2f")
@@ -180,4 +180,4 @@ st.markdown("""
 - Flats equivalent assumes 320 kg CO₂ per flat per year
 - Cars removed equivalent assumes 200 kg CO₂ per car per year
 """)
-st.markdown("Made with ❤️ using Streamlit") 
+st.markdown("Made with ❤️ using Streamlit")
