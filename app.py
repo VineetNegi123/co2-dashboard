@@ -12,6 +12,19 @@ st.markdown("""
         max-width: 1300px;
         margin: 0 auto;
     }
+    .metric-box {
+        background-color: #f9f9f9;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .metric-label {
+        font-size: 16px;
+        color: #666;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -63,43 +76,46 @@ electricity_cost_before = total_energy_before * electricity_rate
 electricity_cost_after = energy_after * electricity_rate
 annual_co2_reduction = energy_savings * carbon_emission_factor
 
-# Display KPIs like screenshot
-st.markdown("### 📊 Key Indicators")
-kpi1, kpi2 = st.columns(2)
+# KPIs
+st.markdown("### 📊 Overview")
+metrics_col, chart_col = st.columns([1, 3])
 
-with kpi1:
-    st.metric("Carbon Reduction", f"{annual_co2_reduction / 1000:.1f} tCO₂e/yr")
+with metrics_col:
+    st.markdown("""
+    <div class="metric-box">{:.1f}<div class="metric-label">tCO₂e/yr<br>Carbon Reduction</div></div>
+    <br>
+    <div class="metric-box">{:,.0f}k<div class="metric-label">kWh/yr<br>Energy Reduction</div></div>
+    """.format(annual_co2_reduction / 1000, energy_savings / 1000), unsafe_allow_html=True)
 
-with kpi2:
-    st.metric("Energy Reduction", f"{energy_savings / 1000:.0f}k kWh/yr")
+with chart_col:
+    st.markdown("#### 📉 Annual Saving % (2024–2026)")
+    years = list(range(2024, 2027))
+    savings = [savings_percentage * 100 - i * 0.2 for i in range(len(years))]  # slight variation
+    energy_trend = [energy_savings - (i * 2000) for i in range(len(years))]  # mock downward trend
 
-# Graph section
-st.markdown("### 📉 Saving Percentage Trend")
-years = [2024, 2025, 2026]
-savings = [savings_percentage * 100] * 3  # constant based on user input
-energy_trend = [energy_savings] * 3
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=years, y=energy_trend, name='Energy Reduction (kWh)',
+                             line=dict(color='rgba(0, 98, 255, 1)', width=3)))
+    fig.add_trace(go.Scatter(x=years, y=[200000]*3, fill='tonexty', mode='none',
+                             fillcolor='rgba(222, 0, 255, 0.08)', name=''))
 
-fig = go.Figure()
-fig.add_trace(go.Scatter(x=years, y=energy_trend, name='Energy Reduction', line=dict(color='blue')))
-fig.add_trace(go.Scatter(x=years, y=savings, name='Saving %', yaxis='y2', line=dict(color='purple', dash='dot')))
+    fig.update_layout(
+        height=380,
+        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14)),
+        yaxis=dict(title='', showgrid=False, tickfont=dict(size=14), range=[0, 220000]),
+        margin=dict(l=10, r=10, t=30, b=30),
+        showlegend=False,
+        plot_bgcolor='white'
+    )
 
-fig.update_layout(
-    height=400,
-    xaxis=dict(title='Year'),
-    yaxis=dict(title='Energy Reduction (kWh)', side='left'),
-    yaxis2=dict(title='Saving %', overlaying='y', side='right', showgrid=False),
-    legend=dict(x=0.01, y=1.15, orientation='h'),
-    margin=dict(l=40, r=40, t=40, b=40),
-    template='simple_white'
-)
-st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True)
 
 # Footer
 st.markdown("---")
 st.markdown("""
 **Notes:**
 - Carbon factor depends on selected country or custom input
-- Graph assumes constant energy saving trend across 3 years
-- Energy reduction is recalculated based on input savings percentage
+- Energy trend and fill curve are mock data for illustration
+- You can update inputs and graph responds accordingly
 """)
 st.caption("Crafted for client-ready insights • Powered by Streamlit")
