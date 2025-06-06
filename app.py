@@ -175,7 +175,7 @@ plt.close()
 # Footer with information about the factors
 st.markdown("---")
 st.markdown("""
-**Notes:**
+*Notes:*
 - Trees planted equivalent assumes each tree absorbs 22 kg CO₂ per year
 - Flats equivalent assumes 320 kg CO₂ per flat per year
 - Cars removed equivalent assumes 200 kg CO₂ per car per year
