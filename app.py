@@ -105,7 +105,7 @@ with metrics_col:
     <br>
     <div class=\"metric-box\">{energy_savings / 1000:,.0f}k<div class=\"metric-label\">kWh/year<br>Energy Reduction</div></div>
     <br>
-    <div class=\"metric-box\">{savings_percentage * 100:.1f}%<div class=\"metric-label\">Annual Saving Percentage</div></div>
+    <div class=\"metric-box\">{savings_percentage * 100:.1f}%<div class=\"metric-label\">Saving Percentage</div></div>
     <br>
     <div class=\"metric-box\">09<div class=\"metric-label\">Months<br>Payback Period</div></div>
     <br>
@@ -155,7 +155,7 @@ with chart_col:
 st.markdown("---")
 st.markdown("""
 **Notes:**
-- Annual savings chart shows total estimated reduction in 2025.
+- Chart shows only total for 2025 without monthly breakdown.
 - ROI forecast reflects adjustable investment + fee vs. energy cost savings.
 - Adaptable across multiple projects—just change inputs and go.
 """)
