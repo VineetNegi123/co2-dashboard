@@ -156,8 +156,8 @@ with chart_col:
 st.markdown("---")
 st.markdown("""
 **Notes:**
-- Monthly energy profile is based on typical HVAC seasonal variation.
-- ROI graph includes adjustable software cost and investment.
-- You can reuse this app across sites by adjusting only 3–5 key fields.
+- Monthly energy profile is based on actual seasonal input for 2025.
+- ROI forecast reflects adjustable investment + fee vs. energy cost savings.
+- Adaptable across multiple projects—just change inputs and go.
 """)
-st.caption("Developed by Univers AI • Powered by Streamlit • Designed for performance-driven sustainability.")
+st.caption("Crafted by Univers AI • Powered by Streamlit • Engineered for client impact.")
