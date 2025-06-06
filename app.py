@@ -102,19 +102,21 @@ with chart_col:
         mode='lines+markers+text',
         text=[f"{int(val/1000)}k" for val in energy_trend],
         textposition="top center"
-    )))
-    fig.add_trace(go.Scatter(x=years, y=[200000]*3, fill='tonexty', mode='none',
-                             fillcolor='rgba(222, 0, 255, 0.08)', name=''))
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=years,
+        y=[200000]*3,
+        fill='tonexty',
+        mode='none',
+        fillcolor='rgba(222, 0, 255, 0.08)',
+        name=''
+    ))
 
     fig.update_layout(
         height=420,
         xaxis=dict(title='', showgrid=False, tickfont=dict(size=14), tickmode='array', tickvals=years),
-        yaxis=dict(title='', showgrid=True, zeroline=False, gridcolor='lightgrey', tickfont=dict(size=14)),
-        margin=dict(l=10, r=10, t=30, b=30),
-        showlegend=False,
-        plot_bgcolor='white'
-    )),
-        yaxis=dict(title='', showgrid=False, tickfont=dict(size=14), range=[0, 220000]),
+        yaxis=dict(title='', showgrid=True, zeroline=False, gridcolor='lightgrey', tickfont=dict(size=14), range=[0, 220000]),
         margin=dict(l=10, r=10, t=30, b=30),
         showlegend=False,
         plot_bgcolor='white'
@@ -131,4 +133,3 @@ st.markdown("""
 - You can update inputs and graph responds accordingly
 """)
 st.caption("Crafted for client-ready insights • Powered by Streamlit")
-
