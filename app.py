@@ -91,7 +91,7 @@ with chart_col:
     st.markdown("#### 📉 Annual Saving")
     years = [2025]
     savings = [savings_percentage * 100]  # slight variation
-    energy_trend = [energy_savings]  # mock downward trend
+    energy_trend = [energy_savings - 20000]  # mock downward trend
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(
@@ -106,7 +106,7 @@ with chart_col:
 
     fig.add_trace(go.Scatter(
         x=years,
-        y=[200000],
+        y=[energy_savings + 20000],
         fill='tonexty',
         mode='none',
         fillcolor='rgba(222, 0, 255, 0.08)',
