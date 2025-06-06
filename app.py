@@ -104,20 +104,25 @@ with metrics_col:
     <div class=\"metric-box\">{annual_co2_reduction / 1000:.1f}<div class=\"metric-label\">tCO₂e/year<br>Carbon Reduction</div></div>
     <br>
     <div class=\"metric-box\">{energy_savings / 1000:,.0f}k<div class=\"metric-label\">kWh/year<br>Energy Reduction</div></div>
+    <br>
+    <div class=\"metric-box\">{savings_percentage * 100:.1f}%<div class=\"metric-label\">Annual Saving Percentage</div></div>
+    <br>
+    <div class=\"metric-box\">09<div class=\"metric-label\">Months<br>Payback Period</div></div>
+    <br>
+    <div class=\"metric-box\">135k<div class=\"metric-label\">US Dollars<br>Net Income (3yrs)</div></div>
     """, unsafe_allow_html=True)
 
 with chart_col:
     st.subheader("📉 Annual Saving (2025)")
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
+    fig.add_trace(go.Bar(
         x=["2025"],
         y=[energy_savings],
         name='Annual Energy Reduction (kWh)',
-        mode='markers+text',
-        marker=dict(color='#3B82F6', size=20),
+        marker_color='#3B82F6',
         text=[f"{int(energy_savings / 1000)}k"],
-        textposition="top center"
+        textposition="outside"
     ))
 
     fig.update_layout(
