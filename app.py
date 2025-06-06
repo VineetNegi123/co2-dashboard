@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from fpdf import FPDF
+import base64
 
 # Set page config
 st.set_page_config(page_title="CO₂ Reduction Calculator", layout="wide")
@@ -33,7 +35,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Title
 st.title("📊 CO₂ Reduction & ROI Dashboard")
 
 # Carbon emission factors by country (kg CO₂/kWh)
@@ -95,7 +96,6 @@ for i in range(years):
     net_cash_flow.append(net if i == 0 else net_cash_flow[-1] + net)
     cumulative_savings.append(net_cash_flow[-1])
 
-# Dynamic net income and payback based on real formula
 three_year_net_income = round(cumulative_savings[2] / 1000)
 payback_months = 0
 for i in range(years):
@@ -103,7 +103,7 @@ for i in range(years):
         payback_months = round((i + 1) * 12 * ((total_costs[i] - annual_savings) / annual_savings), 0)
         break
 
-# Overview Metrics
+# Metrics Display
 st.markdown("### 📈 Overview")
 metrics_col, chart_col = st.columns([1, 3])
 
@@ -122,25 +122,11 @@ with metrics_col:
 
 with chart_col:
     st.subheader("📉 Annual Saving (2025)")
-
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=["2025"],
-        y=[energy_savings],
-        name='Annual Energy Reduction (kWh)',
-        marker_color='#3B82F6',
-        text=[f"{int(energy_savings / 1000)}k"],
-        textposition="outside"
-    ))
-
-    fig.update_layout(
-        height=420,
-        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14), tickvals=["2025"]),
-        yaxis=dict(title='', showgrid=True, gridcolor='#E5E7EB', tickfont=dict(size=14)),
-        margin=dict(l=20, r=20, t=30, b=30),
-        showlegend=False,
-        plot_bgcolor='white'
-    )
+    fig.add_trace(go.Bar(x=["2025"], y=[energy_savings], name='Annual Energy Reduction (kWh)',
+                         marker_color='#3B82F6', text=[f"{int(energy_savings / 1000)}k"], textposition="outside"))
+    fig.update_layout(height=420, xaxis=dict(showgrid=False), yaxis=dict(showgrid=True),
+                      margin=dict(l=20, r=20, t=30, b=30), showlegend=False, plot_bgcolor='white')
     st.plotly_chart(fig, use_container_width=True)
 
     st.subheader("💰 10-Year ROI Forecast")
@@ -148,23 +134,38 @@ with chart_col:
     fig2.add_trace(go.Bar(x=list(range(years)), y=[annual_savings]*years, name="Annual Savings", marker_color="#10B981"))
     fig2.add_trace(go.Bar(x=list(range(years)), y=total_costs, name="Annual Costs", marker_color="#F87171"))
     fig2.add_trace(go.Scatter(x=list(range(years)), y=cumulative_savings, mode='lines+markers', name="Cumulative Net Savings", line=dict(color="#3B82F6")))
-
-    fig2.update_layout(
-        barmode='group',
-        height=400,
-        xaxis_title='Year',
-        yaxis_title='Cash Flow ($)',
-        plot_bgcolor='white',
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-    )
+    fig2.update_layout(barmode='group', height=400, xaxis_title='Year', yaxis_title='Cash Flow ($)',
+                       plot_bgcolor='white', legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
     st.plotly_chart(fig2, use_container_width=True)
 
-# Footer
+# PDF Export Section
 st.markdown("---")
+st.subheader("🧾 Export Proposal Summary")
+
+pdf = FPDF()
+pdf.add_page()
+pdf.set_font("Arial", size=12)
+pdf.cell(200, 10, txt="CO₂ Reduction Proposal Summary", ln=True, align='C')
+pdf.ln(10)
+pdf.cell(200, 10, txt=f"Energy Savings: {energy_savings:,.0f} kWh/year", ln=True)
+pdf.cell(200, 10, txt=f"Carbon Reduction: {annual_co2_reduction / 1000:.1f} tCO₂e/year", ln=True)
+pdf.cell(200, 10, txt=f"Electricity Rate: ${electricity_rate:.3f} /kWh", ln=True)
+pdf.cell(200, 10, txt=f"Savings Percentage: {savings_percentage * 100:.1f}%", ln=True)
+pdf.cell(200, 10, txt=f"Initial Investment: ${initial_investment:,.0f}", ln=True)
+pdf.cell(200, 10, txt=f"Software Fee: ${software_fee:,.0f}/year", ln=True)
+pdf.cell(200, 10, txt=f"Net Income (3yrs): ${three_year_net_income:,}k", ln=True)
+pdf.cell(200, 10, txt=f"Payback Period: {int(payback_months)} months", ln=True)
+
+pdf_output = pdf.output(dest='S').encode('latin-1')
+b64 = base64.b64encode(pdf_output).decode('utf-8')
+href = f'<a href="data:application/octet-stream;base64,{b64}" download="CO2_Proposal_Summary.pdf">📄 Download PDF Summary</a>'
+st.markdown(href, unsafe_allow_html=True)
+
 st.markdown("""
 **Notes:**
 - Chart shows only total for 2025 without monthly breakdown.
 - ROI forecast reflects adjustable investment + fee vs. energy cost savings.
-- Adaptable across multiple projects—just change inputs and go.
+- Click the PDF export button above to generate a proposal summary for your GTM team.
 """)
+
 st.caption("Crafted by Univers AI • Powered by Streamlit • Engineered for client impact.")
