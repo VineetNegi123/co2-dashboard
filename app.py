@@ -127,7 +127,7 @@ with chart_col:
     ))
 
     fig.update_layout(
-        height=400,
+        height=420,
         xaxis=dict(title='', showgrid=False, tickfont=dict(size=13)),
         yaxis=dict(title='', showgrid=True, gridcolor='#E5E7EB', tickfont=dict(size=13)),
         margin=dict(l=20, r=20, t=30, b=30),
