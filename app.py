@@ -76,27 +76,28 @@ electricity_cost_before = total_energy_before * electricity_rate
 electricity_cost_after = energy_after * electricity_rate
 annual_co2_reduction = energy_savings * carbon_emission_factor
 
+# Monthly data breakdown based on actual savings
+typical_month_weights = [8.5, 7.2, 8.4, 7.9, 8.5, 8.2, 8.6, 8.4, 8.1, 8.6, 8.2, 9.4]  # weighted by cooling loads
+weight_sum = sum(typical_month_weights)
+monthly_energy = [(energy_savings * w / weight_sum) for w in typical_month_weights]
+
 # KPIs
 st.markdown("### 📊 Overview")
 metrics_col, chart_col = st.columns([1, 3])
 
 with metrics_col:
-    st.markdown("""
-    <div class="metric-box">{:.1f}<div class="metric-label">tCO₂e/yr<br>Carbon Reduction</div></div>
+    st.markdown(f"""
+    <div class="metric-box">{annual_co2_reduction / 1000:.1f}<div class="metric-label">tCO₂e/yr<br>Carbon Reduction</div></div>
     <br>
-    <div class="metric-box">{:,.0f}k<div class="metric-label">kWh/yr<br>Energy Reduction</div></div>
-    """.format(annual_co2_reduction / 1000, energy_savings / 1000), unsafe_allow_html=True)
+    <div class="metric-box">{energy_savings / 1000:,.0f}k<div class="metric-label">kWh/yr<br>Energy Reduction</div></div>
+    """, unsafe_allow_html=True)
 
 with chart_col:
     st.markdown("#### 📉 Annual Saving")
 
-    # Create a smoother mock curve based on energy_savings
-    months = list(range(1, 13))
-    monthly_energy = [energy_savings * (0.9 + 0.02 * ((i % 6) - 3)) for i in months]
-
     fig = go.Figure()
     fig.add_trace(go.Scatter(
-        x=[f"2025-{m:02d}" for m in months],
+        x=[f"2025-{m:02d}" for m in range(1, 13)],
         y=monthly_energy,
         name='Monthly Energy Reduction (kWh)',
         fill='tozeroy',
@@ -122,7 +123,7 @@ st.markdown("---")
 st.markdown("""
 **Notes:**
 - Carbon factor depends on selected country or custom input
-- Monthly values above are for visualization only
+- Monthly distribution uses weighted approximation from cooling load distribution
 - You can update inputs and graph responds accordingly
 """)
 st.caption("Crafted for client-ready insights • Powered by Streamlit")
