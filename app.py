@@ -88,7 +88,7 @@ with metrics_col:
     """.format(annual_co2_reduction / 1000, energy_savings / 1000), unsafe_allow_html=True)
 
 with chart_col:
-    st.markdown("#### 📉 Annual Saving %")
+    st.markdown("#### 📉 Annual Saving")
     years = list(range(2024, 2027))
     savings = [savings_percentage * 100 - i * 0.2 for i in range(len(years))]  # slight variation
     energy_trend = [energy_savings - (i * 2000) for i in range(len(years))]  # mock downward trend
