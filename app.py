@@ -110,13 +110,15 @@ with chart_col:
     st.subheader("📉 Annual Saving (2025)")
 
     fig = go.Figure()
-    fig.add_trace(go.Bar(
+    fig.add_trace(go.Scatter(
         x=["2025"],
         y=[energy_savings],
-        name='Total Energy Reduction (kWh)',
-        marker_color='#3B82F6',
+        name='Annual Energy Reduction (kWh)',
+        mode='lines+markers+text',
+        line=dict(color='#3B82F6', width=4),
+        fill='tozeroy',
         text=[f"{int(energy_savings / 1000)}k"],
-        textposition="outside"
+        textposition="top center"
     ))
 
     fig.update_layout(
