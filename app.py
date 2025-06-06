@@ -114,16 +114,15 @@ with chart_col:
         x=["2025"],
         y=[energy_savings],
         name='Annual Energy Reduction (kWh)',
-        mode='lines+markers+text',
-        line=dict(color='#3B82F6', width=4),
-        fill='tozeroy',
+        mode='markers+text',
+        marker=dict(color='#3B82F6', size=20),
         text=[f"{int(energy_savings / 1000)}k"],
         textposition="top center"
     ))
 
     fig.update_layout(
         height=420,
-        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14)),
+        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14), tickvals=["2025"]),
         yaxis=dict(title='', showgrid=True, gridcolor='#E5E7EB', tickfont=dict(size=14)),
         margin=dict(l=20, r=20, t=30, b=30),
         showlegend=False,
