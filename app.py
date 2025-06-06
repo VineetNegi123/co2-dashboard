@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from fpdf import FPDF
 import base64
 
 # Set page config
@@ -142,31 +141,31 @@ with chart_col:
 st.markdown("---")
 st.subheader("🧾 Export Proposal Summary")
 
-if st.button("📄 Generate PDF Summary"):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt="CO₂ Reduction Proposal Summary", ln=True, align='C')
-    pdf.ln(10)
-    pdf.cell(200, 10, txt=f"Energy Savings: {energy_savings:,.0f} kWh/year", ln=True)
-    pdf.cell(200, 10, txt=f"Carbon Reduction: {annual_co2_reduction / 1000:.1f} tCO₂e/year", ln=True)
-    pdf.cell(200, 10, txt=f"Electricity Rate: ${electricity_rate:.3f} /kWh", ln=True)
-    pdf.cell(200, 10, txt=f"Savings Percentage: {savings_percentage * 100:.1f}%", ln=True)
-    pdf.cell(200, 10, txt=f"Initial Investment: ${initial_investment:,.0f}", ln=True)
-    pdf.cell(200, 10, txt=f"Software Fee: ${software_fee:,.0f}/year", ln=True)
-    pdf.cell(200, 10, txt=f"Net Income (3yrs): ${three_year_net_income:,}k", ln=True)
-    pdf.cell(200, 10, txt=f"Payback Period: {int(payback_months)} months", ln=True)
+report_content = f'''
+CO₂ Reduction Proposal Summary
 
-    pdf_output = pdf.output(dest='S').encode('latin-1')
-    b64 = base64.b64encode(pdf_output).decode('utf-8')
-    href = f'<a href="data:application/octet-stream;base64,{b64}" download="CO2_Proposal_Summary.pdf">Click here to download PDF</a>'
-    st.markdown(href, unsafe_allow_html=True)
+Energy Savings: {energy_savings:,.0f} kWh/year
+Carbon Reduction: {annual_co2_reduction / 1000:.1f} tCO₂e/year
+Electricity Rate: ${electricity_rate:.3f} /kWh
+Savings Percentage: {savings_percentage * 100:.1f}%
+Initial Investment: ${initial_investment:,.0f}
+Software Fee: ${software_fee:,.0f}/year
+Net Income (3yrs): ${three_year_net_income:,}k
+Payback Period: {int(payback_months)} months
+'''
+
+st.download_button(
+    label="📥 Download Summary Report (TXT)",
+    data=report_content,
+    file_name="CO2_Proposal_Summary.txt",
+    mime="text/plain"
+)
 
 st.markdown("""
 **Notes:**
 - Chart shows only total for 2025 without monthly breakdown.
 - ROI forecast reflects adjustable investment + fee vs. energy cost savings.
-- Click the PDF export button above to generate a proposal summary for your GTM team.
+- Click the download button above to get a printable summary file.
 """)
 
 st.caption("Crafted by Univers AI • Powered by Streamlit • Engineered for client impact.")
