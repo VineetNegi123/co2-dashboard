@@ -67,7 +67,7 @@ with col2:
 
 with col3:
     electricity_rate = st.number_input("Electricity Rate ($/kWh)", value=0.14)
-    savings_percentage = st.number_input("Savings Percentage (%)", value=8.8, format="%.2f") / 100
+    savings_percentage = st.number_input("Savings Percentage", value=8.8, format="%.2f") / 100
 
 # Calculations
 total_energy_before = energy_savings / savings_percentage if savings_percentage > 0 else 0
@@ -89,34 +89,27 @@ with metrics_col:
 
 with chart_col:
     st.markdown("#### 📉 Annual Saving")
-    years = [2025]
-    savings = [savings_percentage * 100]  # slight variation
-    energy_trend = [energy_savings - 20000]  # mock downward trend
+
+    # Create a smoother mock curve based on energy_savings
+    months = list(range(1, 13))
+    monthly_energy = [energy_savings * (0.9 + 0.02 * ((i % 6) - 3)) for i in months]
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(
-        x=years,
-        y=energy_trend,
-        name='Energy Reduction (kWh)',
+        x=[f"2025-{m:02d}" for m in months],
+        y=monthly_energy,
+        name='Monthly Energy Reduction (kWh)',
+        fill='tozeroy',
         line=dict(color='rgba(0, 98, 255, 1)', width=3),
         mode='lines+markers+text',
-        text=[f"{int(val/1000)}k" for val in energy_trend],
+        text=[f"{int(val/1000)}k" for val in monthly_energy],
         textposition="top center"
-    ))
-
-    fig.add_trace(go.Scatter(
-        x=years,
-        y=[energy_savings + 20000],
-        fill='tonexty',
-        mode='none',
-        fillcolor='rgba(222, 0, 255, 0.08)',
-        name=''
     ))
 
     fig.update_layout(
         height=420,
-        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14), tickmode='array', tickvals=years),
-        yaxis=dict(title='', showgrid=True, zeroline=False, gridcolor='lightgrey', tickfont=dict(size=14), range=[energy_savings - 50000, energy_savings + 50000]),
+        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14)),
+        yaxis=dict(title='', showgrid=True, zeroline=False, gridcolor='lightgrey', tickfont=dict(size=14)),
         margin=dict(l=10, r=10, t=30, b=30),
         showlegend=False,
         plot_bgcolor='white'
@@ -129,7 +122,7 @@ st.markdown("---")
 st.markdown("""
 **Notes:**
 - Carbon factor depends on selected country or custom input
-- Energy trend and fill curve are mock data for illustration
+- Monthly values above are for visualization only
 - You can update inputs and graph responds accordingly
 """)
 st.caption("Crafted for client-ready insights • Powered by Streamlit")
