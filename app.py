@@ -81,11 +81,6 @@ electricity_cost_before = total_energy_before * electricity_rate
 electricity_cost_after = energy_after * electricity_rate
 annual_co2_reduction = energy_savings * carbon_emission_factor
 
-# Monthly breakdown (weighted)
-typical_month_weights = [8.5, 7.2, 8.4, 7.9, 8.5, 8.2, 8.6, 8.4, 8.1, 8.6, 8.2, 9.4]
-weight_sum = sum(typical_month_weights)
-monthly_energy = [(energy_savings * w / weight_sum) for w in typical_month_weights]
-
 # ROI Calculations
 initial_investment = st.number_input("Initial Investment ($)", value=16000.0)
 software_fee = st.number_input("Annual Software Fee ($)", value=72817.0)
@@ -112,24 +107,22 @@ with metrics_col:
     """, unsafe_allow_html=True)
 
 with chart_col:
-    st.subheader("📉 Monthly Energy Saving Trend 2025")
+    st.subheader("📉 Annual Saving (2025)")
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=[f"2025-{m:02d}" for m in range(1, 13)],
-        y=monthly_energy,
-        name='Monthly Energy Reduction (kWh)',
-        fill='tozeroy',
-        line=dict(color='#3B82F6', width=3),
-        mode='lines+markers+text',
-        text=[f"{int(val / 1000)}k" for val in monthly_energy],
-        textposition="top center"
+    fig.add_trace(go.Bar(
+        x=["2025"],
+        y=[energy_savings],
+        name='Total Energy Reduction (kWh)',
+        marker_color='#3B82F6',
+        text=[f"{int(energy_savings / 1000)}k"],
+        textposition="outside"
     ))
 
     fig.update_layout(
         height=420,
-        xaxis=dict(title='', showgrid=False, tickfont=dict(size=13)),
-        yaxis=dict(title='', showgrid=True, gridcolor='#E5E7EB', tickfont=dict(size=13)),
+        xaxis=dict(title='', showgrid=False, tickfont=dict(size=14)),
+        yaxis=dict(title='', showgrid=True, gridcolor='#E5E7EB', tickfont=dict(size=14)),
         margin=dict(l=20, r=20, t=30, b=30),
         showlegend=False,
         plot_bgcolor='white'
@@ -156,7 +149,7 @@ with chart_col:
 st.markdown("---")
 st.markdown("""
 **Notes:**
-- Monthly energy profile is based on actual seasonal input for 2025.
+- Annual savings chart shows total estimated reduction in 2025.
 - ROI forecast reflects adjustable investment + fee vs. energy cost savings.
 - Adaptable across multiple projects—just change inputs and go.
 """)
