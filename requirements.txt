@@ -1,5 +1,6 @@
 streamlit
 plotly
 pandas
-fpdf
-kaleido  # Optional, for exporting charts as PNG
+fpdf==1.7.2
+Pillow
+
