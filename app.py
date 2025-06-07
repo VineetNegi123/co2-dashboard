@@ -4,6 +4,8 @@ import plotly.graph_objects as go
 import base64
 from io import BytesIO
 from fpdf import FPDF
+from PIL import Image
+import os
 
 # Set page config
 st.set_page_config(page_title="CO₂ Reduction Calculator", layout="wide")
@@ -159,3 +161,39 @@ st.markdown("""
 """)
 
 st.caption("Crafted by Univers AI • For Proposal Use Only • Powered by Streamlit")
+
+# PDF Export
+
+def create_pdf():
+    pdf = FPDF()
+    pdf.add_page()
+    if os.path.exists("univers_logo.png"):
+        pdf.image("univers_logo.png", x=10, y=8, w=40)
+    pdf.set_font("Arial", "B", 16)
+    pdf.ln(30)
+    pdf.cell(0, 10, "CO₂ Reduction Summary Report", ln=True, align="C")
+    pdf.ln(10)
+    pdf.set_font("Arial", "", 12)
+    pdf.multi_cell(0, 10, f"""
+Energy Savings: {energy_savings:,.0f} kWh/year
+Carbon Reduction: {annual_co2_reduction / 1000:.1f} tCO₂e/year
+Electricity Rate: ${electricity_rate:.3f} /kWh
+Potential Energy Savings: {savings_percentage * 100:.1f}%
+One Time Onboarding Investment: ${initial_investment:,.0f}
+Annual Recurring Software Investment: ${software_fee:,.0f}/year
+Net Income (3yrs): ${three_year_net_income:,}k
+Payback Period: {int(payback_months)} months
+    """.strip())
+    pdf.ln(10)
+    pdf.set_font("Arial", "I", 10)
+    pdf.multi_cell(0, 7, """
+Notes:
+- Savings are indicative only and assume 12 months of clean interval energy + HVAC data.
+- We assume your BMS offers read/write API access.
+- Models use current schedules, set-points and occupancy.
+- No new meters or cybersecurity upgrades included.
+    """.strip())
+    return pdf.output(dest='S').encode('latin1')
+
+pdf_bytes = create_pdf()
+st.download_button("📄 Download Full Proposal PDF", data=pdf_bytes, file_name="co2_summary.pdf", mime="application/pdf")
