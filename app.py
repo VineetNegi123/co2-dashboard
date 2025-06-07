@@ -38,6 +38,10 @@ st.markdown("""
 
 st.title("📊 CO₂ Reduction & ROI Dashboard")
 
+# Currency selector
+currency = st.selectbox("Select Currency", ["SGD", "IDR", "MYR", "HKD", "RMB", "USD"])
+currency_label = f"$ {currency}"
+
 # Carbon emission factors by country (kg CO₂/kWh)
 country_factors = {
     "Indonesia": 0.87,
@@ -73,13 +77,11 @@ with col2:
         st.info(f"Using carbon factor for {selected_country}: {carbon_emission_factor} kg CO₂/kWh")
 
 with col3:
-    electricity_rate = st.number_input("Electricity Rate (SGD/kWh)", value=0.14)
-    savings_percentage = st.number_input("Potential Energy Savings (%)", value=8.8, format="%.2f") / 100
+    electricity_rate = st.number_input(f"Electricity Rate ({currency_label}/kWh)", value=0.14)
+    savings_percentage = st.number_input("Potential Energy Savings", value=8.8, format="%.2f") / 100
 
-# Additional Inputs
-initial_investment = st.number_input("One Time Onboarding Investment (SGD)", value=16000.0)
-software_fee = st.number_input("Annual Recurring Software Investment (SGD)", value=72817.0)
-roi_years = st.selectbox("Select ROI Duration (Years)", options=[3, 5])
+# ROI duration
+roi_years = st.slider("Select ROI Duration (Years)", min_value=3, max_value=5, value=5)
 
 # Derived Calculations
 total_energy_before = energy_savings / savings_percentage if savings_percentage > 0 else 0
@@ -89,6 +91,8 @@ electricity_cost_after = energy_after * electricity_rate
 annual_co2_reduction = energy_savings * carbon_emission_factor
 
 # ROI Calculations
+initial_investment = st.number_input(f"One Time Onboarding Investment ({currency_label})", value=16000.0)
+software_fee = st.number_input(f"Annual Recurring Software Investment ({currency_label})", value=72817.0)
 annual_savings = energy_savings * electricity_rate
 cumulative_savings = []
 net_cash_flow = []
@@ -99,14 +103,15 @@ for i in range(roi_years):
     net_cash_flow.append(net if i == 0 else net_cash_flow[-1] + net)
     cumulative_savings.append(net_cash_flow[-1])
 
-roi_net_income = round(cumulative_savings[-1] / 1000)
+net_income_label = f"Net Income ({roi_years} yrs)"
+threeyr_income = round(cumulative_savings[roi_years - 1] / 1000)
 payback_months = 0
 for i in range(roi_years):
     if cumulative_savings[i] >= 0:
         payback_months = round((i + 1) * 12 * ((total_costs[i] - annual_savings) / annual_savings), 0)
         break
 
-# Display Metrics
+# Metrics Display
 st.markdown("### 📈 Overview")
 metrics_col, chart_col = st.columns([1, 3])
 
@@ -120,7 +125,7 @@ with metrics_col:
     <br>
     <div class=\"metric-box\">{int(payback_months):02d}<div class=\"metric-label\">Months<br>Payback Period</div></div>
     <br>
-    <div class=\"metric-box\">{roi_net_income}k<div class=\"metric-label\">SGD<br>Net Income ({roi_years}yrs)</div></div>
+    <div class=\"metric-box\">{threeyr_income}k<div class=\"metric-label\">{currency}<br>{net_income_label}</div></div>
     """, unsafe_allow_html=True)
 
 with chart_col:
@@ -137,16 +142,16 @@ with chart_col:
     fig2.add_trace(go.Bar(x=list(range(roi_years)), y=[annual_savings]*roi_years, name="Annual Savings", marker_color="#10B981"))
     fig2.add_trace(go.Bar(x=list(range(roi_years)), y=total_costs, name="Annual Costs", marker_color="#F87171"))
     fig2.add_trace(go.Scatter(x=list(range(roi_years)), y=cumulative_savings, mode='lines+markers', name="Cumulative Net Savings", line=dict(color="#3B82F6")))
-    fig2.update_layout(barmode='group', height=400, xaxis_title='Year', yaxis_title='Cash Flow (SGD)',
+    fig2.update_layout(barmode='group', height=400, xaxis_title='Year', yaxis_title=f'Cash Flow ({currency_label})',
                        plot_bgcolor='white', legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
     st.plotly_chart(fig2, use_container_width=True)
 
     st.markdown(f"""
     <p style='font-size:14px; color:#555;'>
     📌 <b>Summary:</b><br>
-    Year 0: One-time onboarding investment + recurring software<br>
-    Year 1–{roi_years}: Annual recurring software investment vs. projected savings<br>
-    Blue line shows cumulative savings.
+    Year 0: Initial onboarding + annual investment<br>
+    Year 1–{roi_years}: Annual recurring software investment compared to expected savings<br>
+    Cumulative savings shown in blue line.
     </p>
     """, unsafe_allow_html=True)
 
