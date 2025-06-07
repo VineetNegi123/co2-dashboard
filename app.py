@@ -4,8 +4,6 @@ import plotly.graph_objects as go
 import base64
 from io import BytesIO
 from fpdf import FPDF
-from PIL import Image
-import os
 
 # Set page config
 st.set_page_config(page_title="CO₂ Reduction Calculator", layout="wide")
@@ -59,6 +57,12 @@ country_factors = {
     "Custom": None
 }
 
+# Currency selection
+currency_options = {"USD": "$", "SGD": "S$", "MYR": "RM", "IDR": "Rp", "HKD": "HK$", "RMB": "¥"}
+st.sidebar.markdown("### 💱 Currency")
+selected_currency = st.sidebar.selectbox("Select Currency", options=list(currency_options.keys()), index=0)
+currency_symbol = currency_options[selected_currency]
+
 # Input Section
 st.header("🔧 Input Parameters")
 col1, col2, col3 = st.columns(3)
@@ -75,7 +79,7 @@ with col2:
         st.info(f"Using carbon factor for {selected_country}: {carbon_emission_factor} kg CO₂/kWh")
 
 with col3:
-    electricity_rate = st.number_input("Electricity Rate (USD/kWh)", value=0.14)
+    electricity_rate = st.number_input(f"Electricity Rate ({currency_symbol}/kWh)", value=0.14)
     savings_percentage = st.number_input("Potential Energy Savings", value=8.8, format="%.2f") / 100
 
 # Derived Calculations
@@ -86,9 +90,9 @@ electricity_cost_after = energy_after * electricity_rate
 annual_co2_reduction = energy_savings * carbon_emission_factor
 
 # ROI Calculations
-initial_investment = st.number_input("One Time Onboarding Investment", value=16000.0)
-software_fee = st.number_input("Annual Recurring Software Investment", value=72817.0)
-years = 5
+initial_investment = st.number_input(f"One Time Onboarding Investment ({currency_symbol})", value=16000.0)
+software_fee = st.number_input(f"Annual Recurring Software Investment ({currency_symbol})", value=72817.0)
+years = st.slider("Select ROI Duration (Years)", min_value=3, max_value=10, value=5)
 annual_savings = energy_savings * electricity_rate
 cumulative_savings = []
 net_cash_flow = []
@@ -99,7 +103,7 @@ for i in range(years):
     net_cash_flow.append(net if i == 0 else net_cash_flow[-1] + net)
     cumulative_savings.append(net_cash_flow[-1])
 
-three_year_net_income = round(cumulative_savings[2] / 1000)
+net_income_k = round(cumulative_savings[years-1] / 1000)
 payback_months = 0
 for i in range(years):
     if cumulative_savings[i] >= 0:
@@ -114,13 +118,13 @@ with metrics_col:
     st.markdown(f"""
     <div class=\"metric-box\">{annual_co2_reduction / 1000:.1f}<div class=\"metric-label\">tCO₂e/year<br>Carbon Reduction</div></div>
     <br>
-    <div class=\"metric-box\">{energy_savings / 1000:,.0f}k<div class=\"metric-label\">kWh/year<br>Energy Reduction</div></div>
+    <div class=\"metric-box\">{energy_savings / 1000:,.0f}k<div class=\"metric-label\">kWh/year<br>Energy Reduction <span title='Energy consumption saved annually compared to baseline.' style='font-size:14px;'>ℹ️</span></div></div>
     <br>
     <div class=\"metric-box\">{savings_percentage * 100:.1f}%<div class=\"metric-label\">Potential Energy Savings</div></div>
     <br>
     <div class=\"metric-box\">{int(payback_months):02d}<div class=\"metric-label\">Months<br>Payback Period</div></div>
     <br>
-    <div class=\"metric-box\">{three_year_net_income}k<div class=\"metric-label\">USD<br>Net Income (3yrs)</div></div>
+    <div class=\"metric-box\">{net_income_k}k<div class=\"metric-label\">{selected_currency}<br>Net Income ({years}yrs)</div></div>
     """, unsafe_allow_html=True)
 
 with chart_col:
@@ -132,21 +136,21 @@ with chart_col:
                       margin=dict(l=20, r=20, t=30, b=30), showlegend=False, plot_bgcolor='white')
     st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("💰 5-Year ROI Forecast")
+    st.subheader(f"💰 {years}-Year ROI Forecast")
     fig2 = go.Figure()
     fig2.add_trace(go.Bar(x=list(range(years)), y=[annual_savings]*years, name="Annual Savings", marker_color="#10B981"))
     fig2.add_trace(go.Bar(x=list(range(years)), y=total_costs, name="Annual Costs", marker_color="#F87171"))
     fig2.add_trace(go.Scatter(x=list(range(years)), y=cumulative_savings, mode='lines+markers', name="Cumulative Net Savings", line=dict(color="#3B82F6")))
-    fig2.update_layout(barmode='group', height=400, xaxis_title='Year', yaxis_title='Cash Flow (USD)',
+    fig2.update_layout(barmode='group', height=400, xaxis_title='Year', yaxis_title=f'Cash Flow ({selected_currency})',
                        plot_bgcolor='white', legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
     st.plotly_chart(fig2, use_container_width=True)
 
     st.markdown(f"""
     <p style='font-size:14px; color:#555;'>
     📌 <b>Summary:</b><br>
-    Year 0: Initial onboarding + annual investment<br>
-    Year 1–5: Annual recurring software investment compared to expected savings<br>
-    Cumulative savings shown in blue line.
+    Year 0: One-time onboarding investment + Year 1 software fee<br>
+    Year 1–{years}: Annual recurring software investment vs. energy savings<br>
+    Cumulative savings trend shown above.
     </p>
     """, unsafe_allow_html=True)
 
@@ -161,39 +165,3 @@ st.markdown("""
 """)
 
 st.caption("Crafted by Univers AI • For Proposal Use Only • Powered by Streamlit")
-
-# PDF Export
-
-def create_pdf():
-    pdf = FPDF()
-    pdf.add_page()
-    if os.path.exists("univers_logo.png"):
-        pdf.image("univers_logo.png", x=10, y=8, w=40)
-    pdf.set_font("Arial", "B", 16)
-    pdf.ln(30)
-    pdf.cell(0, 10, "CO₂ Reduction Summary Report", ln=True, align="C")
-    pdf.ln(10)
-    pdf.set_font("Arial", "", 12)
-    pdf.multi_cell(0, 10, f"""
-Energy Savings: {energy_savings:,.0f} kWh/year
-Carbon Reduction: {annual_co2_reduction / 1000:.1f} tCO₂e/year
-Electricity Rate: ${electricity_rate:.3f} /kWh
-Potential Energy Savings: {savings_percentage * 100:.1f}%
-One Time Onboarding Investment: ${initial_investment:,.0f}
-Annual Recurring Software Investment: ${software_fee:,.0f}/year
-Net Income (3yrs): ${three_year_net_income:,}k
-Payback Period: {int(payback_months)} months
-    """.strip())
-    pdf.ln(10)
-    pdf.set_font("Arial", "I", 10)
-    pdf.multi_cell(0, 7, """
-Notes:
-- Savings are indicative only and assume 12 months of clean interval energy + HVAC data.
-- We assume your BMS offers read/write API access.
-- Models use current schedules, set-points and occupancy.
-- No new meters or cybersecurity upgrades included.
-    """.strip())
-    return pdf.output(dest='S').encode('latin1')
-
-pdf_bytes = create_pdf()
-st.download_button("📄 Download Full Proposal PDF", data=pdf_bytes, file_name="co2_summary.pdf", mime="application/pdf")
